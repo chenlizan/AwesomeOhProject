@@ -17,8 +17,13 @@
 #include "generated/NativeSetting.h"
 #include "generated/NativeTim.h"
 #include "generated/NativeVodUpload.h"
+#include "generated/RNGestureHandlerModule.h"
 #include "generated/NativeVideoComponentDescriptor.h"
+#include "generated/RNGestureHandlerButtonComponentDescriptor.h"
+#include "generated/RNGestureHandlerRootViewComponentDescriptor.h"
 #include "generated/NativeVideoJSIBinder.h"
+#include "generated/RNGestureHandlerButtonJSIBinder.h"
+#include "generated/RNGestureHandlerRootViewJSIBinder.h"
 
 namespace rnoh {
 
@@ -42,6 +47,9 @@ class RNOHGeneratedPackageTurboModuleFactoryDelegate : public TurboModuleFactory
         }
         if (name == "NativeVodUpload") {
             return std::make_shared<NativeVodUpload>(ctx, name);
+        }
+        if (name == "RNGestureHandlerModule") {
+            return std::make_shared<RNGestureHandlerModule>(ctx, name);
         }
         return nullptr;
     };
@@ -84,12 +92,16 @@ class RNOHGeneratedPackage : public Package {
     std::vector<facebook::react::ComponentDescriptorProvider> createComponentDescriptorProviders() override {
         return {
             facebook::react::concreteComponentDescriptorProvider<facebook::react::NativeVideoComponentDescriptor>(),
+            facebook::react::concreteComponentDescriptorProvider<facebook::react::RNGestureHandlerButtonComponentDescriptor>(),
+            facebook::react::concreteComponentDescriptorProvider<facebook::react::RNGestureHandlerRootViewComponentDescriptor>(),
         };
     }
 
     ComponentJSIBinderByString createComponentJSIBinderByName() override {
         return {
             {"NativeVideo", std::make_shared<NativeVideoJSIBinder>()},
+            {"RNGestureHandlerButton", std::make_shared<RNGestureHandlerButtonJSIBinder>()},
+            {"RNGestureHandlerRootView", std::make_shared<RNGestureHandlerRootViewJSIBinder>()},
         };
     };
 

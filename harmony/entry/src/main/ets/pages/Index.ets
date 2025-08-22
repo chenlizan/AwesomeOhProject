@@ -11,18 +11,14 @@ import {
   RNOHCoreContext
 } from '@rnoh/react-native-openharmony';
 import { createRNPackages } from '../RNPackagesFactory';
+
 // import { NativeVideo } from '../RNComponent/NativeVideo';
 
 const arkTsComponentNames: Array<string> = [];
 
 @Builder
 export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
-  // if (ctx.componentName === NativeVideo.NAME) {
-  //   NativeVideo({
-  //     ctx: ctx.rnComponentContext,
-  //     tag: ctx.tag
-  //   })
-  // }
+
 }
 
 const wrappedCustomRNComponentBuilder = wrapBuilder(buildCustomRNComponent)
