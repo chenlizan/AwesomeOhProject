@@ -19,6 +19,7 @@ add_subdirectory("${OH_MODULE_DIR}/@react-native-oh-tpl/react-native-pager-view/
 add_subdirectory("${OH_MODULE_DIR}/@react-native-oh-tpl/react-native-reanimated/src/main/cpp" ./reanimated)
 add_subdirectory("${OH_MODULE_DIR}/@react-native-oh-tpl/react-native-safe-area-context/src/main/cpp" ./safe-area)
 add_subdirectory("${OH_MODULE_DIR}/@react-native-oh-tpl/react-native-svg/src/main/cpp" ./svg)
+add_subdirectory("${OH_MODULE_DIR}/@react-native-oh-tpl/react-native-video/src/main/cpp" ./video)
 
 file(GLOB GENERATED_APP_FILES "./generated/*.cpp")
 add_library(rnoh_app SHARED
@@ -34,3 +35,4 @@ target_link_libraries(rnoh_app PUBLIC rnoh_pager_view )
 target_link_libraries(rnoh_app PUBLIC rnoh_reanimated)
 target_link_libraries(rnoh_app PUBLIC rnoh_safe_area)
 target_link_libraries(rnoh_app PUBLIC rnoh_svg)
+target_link_libraries(rnoh_app PUBLIC rnoh_video)

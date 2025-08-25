@@ -5,6 +5,7 @@ import { ViewPagerPackage } from '@react-native-oh-tpl/react-native-pager-view';
 import { ReanimatedPackage } from '@react-native-oh-tpl/react-native-reanimated/ts';
 import { SafeAreaViewPackage } from '@react-native-oh-tpl/react-native-safe-area-context';
 import { SvgPackage } from '@react-native-oh-tpl/react-native-svg';
+import { RNCVideoPackage } from '@react-native-oh-tpl/react-native-video/ts';
 import { DeviceInfoPackage } from "./tm/DeviceInfoPackage";
 import { SettingPackage } from './tm/SettingPackage';
 import { NetPackage } from './tm/NetPackage'
@@ -17,6 +18,7 @@ export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
     new FastImagePackage(ctx),
     new GestureHandlerPackage(ctx),
     new ReanimatedPackage(ctx),
+    new RNCVideoPackage(ctx),
     new SafeAreaViewPackage(ctx),
     new SvgPackage(ctx),
     new ViewPagerPackage(ctx),

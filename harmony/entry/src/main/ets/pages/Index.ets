@@ -10,15 +10,28 @@ import {
   TraceJSBundleProviderDecorator,
   RNOHCoreContext
 } from '@rnoh/react-native-openharmony';
+import { RNCVideo, RNC_VIDEO_TYPE } from "@react-native-oh-tpl/react-native-video"
 import { createRNPackages } from '../RNPackagesFactory';
 
-// import { NativeVideo } from '../RNComponent/NativeVideo';
+import { AuthInfo, NativeVideo } from '../RNComponent/NativeVideo';
 
-const arkTsComponentNames: Array<string> = [];
+const arkTsComponentNames: Array<string> = [RNC_VIDEO_TYPE, NativeVideo.NAME];
 
 @Builder
 export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
-
+  if (ctx.componentName === NativeVideo.NAME) {
+    NativeVideo({
+      ctx: ctx.rnComponentContext,
+      tag: ctx.tag,
+      authInfo: new AuthInfo('', '', 0)
+    })
+  }
+  if (ctx.componentName === RNC_VIDEO_TYPE) {
+    RNCVideo({
+      ctx: ctx.rnComponentContext,
+      tag: ctx.tag
+    })
+  }
 }
 
 const wrappedCustomRNComponentBuilder = wrapBuilder(buildCustomRNComponent)
