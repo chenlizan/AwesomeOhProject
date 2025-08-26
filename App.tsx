@@ -5,23 +5,31 @@
  * @format
  */
 
-import React, {useState, useRef} from 'react';
-import {
-  Dimensions,
-  View,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-} from 'react-native';
+import React, {useState} from 'react';
+import {Dimensions, View, ScrollView, StyleSheet, Text} from 'react-native';
 import NativeVideo from './src/turboModule/NativeVideo';
 
 const {height} = Dimensions.get('screen');
+
 function App(): JSX.Element {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.container}>
-        <NativeVideo style={styles.video} />
+        <NativeVideo
+          style={styles.video}
+          data={{
+            isPrivate: true,
+            private_url:
+              'https://res.vmallres.com//uomcdn/CN/cms/202210/C75C7E20060F3E909F2998E13C3ABC03.mp4',
+            video_id: '',
+            play_auth: '',
+            played: 0,
+            referer: '',
+          }}
+          onFullScreenChange={e => {
+            console.log(e.nativeEvent.status);
+          }}
+        />
       </View>
     </ScrollView>
   );

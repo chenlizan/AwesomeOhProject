@@ -23,10 +23,10 @@ export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
     new SvgPackage(ctx),
     new ViewPagerPackage(ctx),
     new DeviceInfoPackage(ctx),
-    new SettingPackage(ctx),
     new NetPackage(ctx),
-    new VodUploadPackage(ctx),
     new RSAPackage(ctx),
+    new SettingPackage(ctx),
     new TimPackage(ctx),
+    new VodUploadPackage(ctx)
   ];
 }

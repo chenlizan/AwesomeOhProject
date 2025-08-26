@@ -1,9 +1,7 @@
 import { display, window } from "@kit.ArkUI";
-import { RNOHContext, RNViewBase } from "@rnoh/react-native-openharmony";
+import { Descriptor, RNOHContext, RNViewBase, ViewBaseProps } from "@rnoh/react-native-openharmony";
 import { RNC } from "@rnoh/react-native-openharmony/generated";
-import { AliPlayerFactory, AliPlayer, InfoBean, InfoCode, VidAuth, UrlSource } from 'premierlibrary'
-import { common } from "@kit.AbilityKit";
-
+import { AliPlayerFactory, AliPlayer, InfoBean, InfoCode, VidAuth, UrlSource, ErrorInfo } from 'premierlibrary'
 
 function fill(value: number): string {
   return value.toString().padStart(2, '0')
@@ -21,28 +19,30 @@ function msToCountdownTime(ms: number): string {
   return `${(days ? fill(days) + ':' : '')}${(fill(hours))}:${fill(minutes)}:${fill(seconds)} `.trim()
 }
 
-@Observed
-export class AuthInfo {
-  public videoId: string = ''
-  public playAuth: string = ''
-  public position: number = 0
+export const NATIVE_VIDEO_TYPE: string = RNC.NativeVideo.NAME
 
-  constructor(videoId: string, playAuth: string, position: number) {
-    this.videoId = videoId
-    this.playAuth = playAuth
-    this.position = position
-  }
+interface DataModal {
+  isPrivate: boolean;
+  private_url: string;
+  video_id: string;
+  play_auth: string;
+  played: number;
+  referer: string;
 }
 
-const context: Context = getContext(this)
+export interface NativeVideoProps extends ViewBaseProps {
+  data: DataModal
+}
+
+export interface AutoLayoutViewState {}
+
+export type VideoViewDescriptor = Descriptor<"RNCVideo", ViewBaseProps, AutoLayoutViewState, NativeVideoProps>
 
 @Component
 export struct NativeVideo {
   ctx!: RNOHContext;
   tag: number = -1;
-  public static readonly NAME = RNC.NativeVideo.NAME
-  private xComponentController = new XComponentController()
-  private aliPlayer: AliPlayer = AliPlayerFactory.createAliPlayer(getContext(), '')
+  @State descriptor: VideoViewDescriptor = Object() as VideoViewDescriptor;
   @State screenWidth: number = 0
   @State screenHeight: number = 0
   @State currentTime: string = '00:00:00'
@@ -50,24 +50,46 @@ export struct NativeVideo {
   @State progress: number = 0
   @State progressMax: number = 0
   @State playing: boolean = false
+  @State firstStarted: boolean = true
   @State speed: number = 1.0
   @State fullscreen: boolean = false
   @State showBar: boolean = true
-  @ObjectLink @Watch('onAuthInfoChange') authInfo: AuthInfo
-  onFullscreen: (v: boolean) => void = () => {
-  }
-  private windowClass = (context as common.UIAbilityContext).windowStage.getMainWindowSync()
-  @State statusBarHeight: number = 0
+  private aliPlayer: AliPlayer = AliPlayerFactory.createAliPlayer(getContext(), '')
+  private eventEmitter: RNC.NativeVideo.EventEmitter | undefined = undefined
+  private xComponentController = new XComponentController()
 
   initPlayerEventListeners() {
     if (this.aliPlayer) {
+      this.aliPlayer.setOnCompletionListener({
+        onCompletion: () => {
+          this.eventEmitter?.emit("playCompleted", null)
+        }
+      })
+      this.aliPlayer.setOnErrorListener({
+        onError: (errorInfo: ErrorInfo) => {
+          this.eventEmitter?.emit("error", {
+            code: errorInfo.getCode(),
+            message: errorInfo.getMsg()
+          })
+        }
+      })
       this.aliPlayer.setOnInfoListener({
         onInfo: (bean: InfoBean) => {
           if (bean.getCode() === InfoCode.CurrentPosition) {
             let time: number = bean.getExtraValue()
             this.currentTime = msToCountdownTime(time)
             this.progress = time
+            this.eventEmitter?.emit("playingProgress", {
+              progress: this.progress
+            })
           }
+        }
+      })
+      this.aliPlayer.setOnPreparedListener({
+        onPrepared: () => {
+          this.eventEmitter?.emit("prepareDone", {
+            progress: this.aliPlayer.getDuration()
+          })
         }
       })
       this.aliPlayer.setOnStateChangedListener({
@@ -94,13 +116,21 @@ export struct NativeVideo {
               toastStatus = "正在播放"
               this.playing = true
               this.hideBar()
+              if (this.firstStarted) {
+                this.firstStarted = false
+                this.eventEmitter?.emit("playResume", null)
+              } else {
+                this.eventEmitter?.emit("playResume", null)
+              }
               break
             case 4:
               toastStatus = "已暂停"
               this.playing = false
+              this.eventEmitter?.emit("playPause", null)
               break
             case 5:
               toastStatus = "已停止"
+              this.eventEmitter?.emit("playerStop", null)
               break
             case 6:
               toastStatus = "播放完成"
@@ -125,28 +155,32 @@ export struct NativeVideo {
     }, 4000)
   }
 
-  onAuthInfoChange() {
-    const vidAuthSource: VidAuth = new VidAuth()
-    vidAuthSource.setVid(this.authInfo.videoId)
-    vidAuthSource.setPlayAuth(this.authInfo.playAuth)
-    this.aliPlayer.setVidAuthDataSource(vidAuthSource)
-    this.aliPlayer.prepare()
-  }
-
   aboutToAppear(): void {
+    this.eventEmitter = new RNC.NativeVideo.EventEmitter(this.ctx.rnInstance, this.tag);
+    this.descriptor = this.ctx.descriptorRegistry.getDescriptor<VideoViewDescriptor>(this.tag);
+    this.ctx.descriptorRegistry.subscribeToDescriptorChanges(this.tag,
+      (newDescriptor) => {
+        this.descriptor = (newDescriptor as VideoViewDescriptor);
+      })
     this.screenWidth = px2vp(display.getDefaultDisplaySync().width)
     this.screenHeight = px2vp(display.getDefaultDisplaySync().height)
-    const avoidArea = this.windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM)
-    this.statusBarHeight = px2vp(avoidArea.topRect.height)
     display.on('change', () => {
       this.screenWidth = px2vp(display.getDefaultDisplaySync().width)
       this.screenHeight = px2vp(display.getDefaultDisplaySync().height)
     })
     this.initPlayerEventListeners()
-    let urlSource: UrlSource = new UrlSource();
-    urlSource.setUri('https://res.vmallres.com//uomcdn/CN/cms/202210/C75C7E20060F3E909F2998E13C3ABC03.mp4')
-    this.aliPlayer.setUrlDataSource(urlSource);
-    this.aliPlayer.prepare()
+    if (this.descriptor.rawProps.data.isPrivate) {
+      let urlSource: UrlSource = new UrlSource();
+      urlSource.setUri(this.descriptor.rawProps.data.private_url)
+      this.aliPlayer.setUrlDataSource(urlSource);
+      this.aliPlayer.prepare()
+    } else {
+      const vidAuthSource: VidAuth = new VidAuth()
+      vidAuthSource.setVid(this.descriptor.rawProps.data.video_id)
+      vidAuthSource.setPlayAuth(this.descriptor.rawProps.data.play_auth)
+      this.aliPlayer.setVidAuthDataSource(vidAuthSource)
+      this.aliPlayer.prepare()
+    }
   }
 
   build() {
@@ -212,6 +246,7 @@ export struct NativeVideo {
                 }
                 this.speed = newSpeed
                 this.aliPlayer.setSpeed(newSpeed)
+                this.eventEmitter?.emit("rateChange", { rate: this.speed })
               })
             Image(this.fullscreen ? $r('app.media.exitfullscreen') : $r('app.media.fullscreen'))
               .flexBasis(50)
@@ -225,7 +260,9 @@ export struct NativeVideo {
                   windowClass.setWindowSystemBarEnable([])
                 }
                 this.fullscreen = !this.fullscreen
-                this.onFullscreen(this.fullscreen)
+                this.eventEmitter?.emit("fullScreenChange", {
+                  status: this.fullscreen
+                })
               })
           }
           .margin({ left: 8, right: 8 })

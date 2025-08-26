@@ -13,17 +13,16 @@ import {
 import { RNCVideo, RNC_VIDEO_TYPE } from "@react-native-oh-tpl/react-native-video"
 import { createRNPackages } from '../RNPackagesFactory';
 
-import { AuthInfo, NativeVideo } from '../RNComponent/NativeVideo';
+import { NativeVideo, NATIVE_VIDEO_TYPE } from '../RNComponent/NativeVideo';
 
-const arkTsComponentNames: Array<string> = [RNC_VIDEO_TYPE, NativeVideo.NAME];
+const arkTsComponentNames: Array<string> = [RNC_VIDEO_TYPE, NATIVE_VIDEO_TYPE];
 
 @Builder
 export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
-  if (ctx.componentName === NativeVideo.NAME) {
+  if (ctx.componentName === NATIVE_VIDEO_TYPE) {
     NativeVideo({
       ctx: ctx.rnComponentContext,
       tag: ctx.tag,
-      authInfo: new AuthInfo('', '', 0)
     })
   }
   if (ctx.componentName === RNC_VIDEO_TYPE) {
