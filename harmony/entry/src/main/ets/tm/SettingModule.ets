@@ -1,6 +1,7 @@
 import { TurboModule } from "@rnoh/react-native-openharmony"
 import { TM } from '@rnoh/react-native-openharmony/generated/ts'
 import { common } from "@kit.AbilityKit"
+import { updateManager } from "@kit.StoreKit"
 
 export class SettingModule extends TurboModule implements TM.NativeSetting.Spec {
   openSystemSettings(): Promise<void> {
@@ -39,6 +40,11 @@ export class SettingModule extends TurboModule implements TM.NativeSetting.Spec 
         pushParams: context.abilityInfo.bundleName
       }
     })
+    return new Promise((resolve) => resolve())
+  }
+
+  openUpdateDialog(): Promise<void> {
+    updateManager.showUpdateDialog(getContext() as common.UIAbilityContext)
     return new Promise((resolve) => resolve())
   }
 }
