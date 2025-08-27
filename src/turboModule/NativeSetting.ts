@@ -3,8 +3,13 @@ import {TurboModuleRegistry} from 'react-native';
 
 export interface Spec extends TurboModule {
   openSystemSettings(): Promise<void>;
+
   openWifiSettings(): Promise<void>;
+
   openNetworkSettings(): Promise<void>;
+
+  openUpdateDialog(): Promise<void>;
 }
+
 export const SettingModule =
   TurboModuleRegistry.getEnforcing<Spec>('NativeSetting');
