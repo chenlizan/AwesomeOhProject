@@ -160,7 +160,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return Promise.reject()
+        return Promise.resolve()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -181,7 +181,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return Promise.reject()
+        return Promise.resolve()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -204,7 +204,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return Promise.reject()
+        return Promise.resolve()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -227,7 +227,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return Promise.reject()
+        return Promise.resolve()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -332,7 +332,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
             groupTipsElem: tipsMap
           } as TM.NativeTim.HistoryMessageModel
         })
-        return list
+        return Promise.resolve(list)
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -349,23 +349,21 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
     return V2TIMManager.getConversationManager().getConversationListByFilter(0, Number.MAX_VALUE, filter)
       .then((result: V2TIMConversationResult) => {
         const list = result.conversationList.map(item => {
-          return {} as TM.NativeTim.ConversationModel
-
-          // return {
-          //   conversationID: item.conversationID,
-          //   userID: item.userID,
-          //   groupID: item.groupID,
-          //   showName: item.showName,
-          //   faceUrl: item.faceUrl,
-          //   unreadCount: item.unreadCount,
-          //   orderKey: item.orderKey,
-          //   timestamp: dayjs(item.lastMessage.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss'),
-          //   elemType: item.lastMessage.elemType,
-          //   msgStatus: item.lastMessage.status,
-          //   sender: item.lastMessage.sender,
-          //   nickName: item.lastMessage.nickName,
-          //   textElem: item.lastMessage.textElem,
-          // } as TM.NativeTim.ConversationModel
+          return {
+            conversationID: item.conversationID,
+            userID: item.userID,
+            groupID: item.groupID,
+            showName: item.showName,
+            faceUrl: item.faceUrl,
+            unreadCount: item.unreadCount,
+            orderKey: Number(item.orderKey),
+            timestamp: dayjs(item.lastMessage.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss'),
+            elemType: item.lastMessage.elemType,
+            msgStatus: item.lastMessage.status,
+            sender: item.lastMessage.sender,
+            nickName: item.lastMessage.nickName,
+            textElem: item.lastMessage.textElem?.text,
+          } as TM.NativeTim.ConversationModel
         })
         return Promise.resolve(list)
       })
@@ -414,7 +412,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
             createTime: item.createTime.toString()
           } as TM.NativeTim.JoinedGroupModel
         })
-        return list
+        return Promise.resolve(list)
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -436,7 +434,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
             faceUrl: item.info.faceURL,
           } as TM.NativeTim.GroupInfo
         })
-        return list
+        return Promise.resolve(list)
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -453,7 +451,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
             studentN: decoder.decodeToString(new Uint8Array(item.customInfo.get('studentN'))),
           } as TM.NativeTim.UsersInfo
         })
-        return list
+        return Promise.resolve(list)
       })
       .catch((error: Error) => {
         return Promise.reject(error)
