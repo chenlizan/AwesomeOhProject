@@ -15,8 +15,11 @@ import {
   SafeAreaView,
 } from 'react-native';
 import NativeVideo from './src/turboModule/NativeVideo';
+import {NetModule} from './src/turboModule/NativeNet';
 
 const {height} = Dimensions.get('screen');
+
+NetModule.init();
 
 function App(): JSX.Element {
   return (
@@ -34,7 +37,7 @@ function App(): JSX.Element {
               played: 0,
               referer: '',
             }}
-            onFullScreenChange={e => {
+            onFullScreenChange={async e => {
               console.log(e.nativeEvent.status);
             }}
           />
@@ -55,6 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
   },
   safe: {
+    flex: 1,
     paddingTop: 0,
     paddingBottom: 0,
   },

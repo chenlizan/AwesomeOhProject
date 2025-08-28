@@ -7,6 +7,7 @@ export interface ResultModel {
   status: string;
 }
 export interface Spec extends TurboModule {
+  init(): void;
   getCurrentNetStatus(): Promise<ResultModel>;
 }
 export const NetModule = TurboModuleRegistry.getEnforcing<Spec>('NativeNet');

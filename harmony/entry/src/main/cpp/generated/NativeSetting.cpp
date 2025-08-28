@@ -17,6 +17,7 @@ NativeSetting::NativeSetting(const ArkTSTurboModule::Context ctx, const std::str
         ARK_ASYNC_METHOD_METADATA(openSystemSettings, 0),
         ARK_ASYNC_METHOD_METADATA(openWifiSettings, 0),
         ARK_ASYNC_METHOD_METADATA(openNetworkSettings, 0),
+        ARK_ASYNC_METHOD_METADATA(openUpdateDialog, 0),
     };
 }
 

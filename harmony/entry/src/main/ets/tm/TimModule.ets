@@ -19,6 +19,7 @@ import {
   V2TIMSDKListener,
   V2TIMUserFullInfo
 } from "@tencentcloud/imsdk"
+import { V2TIMConversationResult } from "@tencentcloud/imsdk/src/main/ets/V2TIMConversation"
 
 interface LISTENER_TYPE_MODEL {
   CUSTOM_MESSAGE: string
@@ -159,7 +160,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return
+        return Promise.reject()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -180,7 +181,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return
+        return Promise.reject()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -203,7 +204,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return
+        return Promise.reject()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -226,7 +227,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
         })
       .promise
       .then(() => {
-        return
+        return Promise.reject()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
@@ -339,7 +340,38 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
   }
 
   getConversationList(isC2C: boolean): Promise<TM.NativeTim.ConversationModel[]> {
-    return new Promise((resolve) => resolve([]))
+    const filter: V2TIMConversationListFilter = {
+      type: V2TIMConversationType.V2TIM_GROUP,
+    }
+    if (isC2C) {
+      filter.type = V2TIMConversationType.V2TIM_C2C
+    }
+    return V2TIMManager.getConversationManager().getConversationListByFilter(0, Number.MAX_VALUE, filter)
+      .then((result: V2TIMConversationResult) => {
+        const list = result.conversationList.map(item => {
+          return {} as TM.NativeTim.ConversationModel
+
+          // return {
+          //   conversationID: item.conversationID,
+          //   userID: item.userID,
+          //   groupID: item.groupID,
+          //   showName: item.showName,
+          //   faceUrl: item.faceUrl,
+          //   unreadCount: item.unreadCount,
+          //   orderKey: item.orderKey,
+          //   timestamp: dayjs(item.lastMessage.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss'),
+          //   elemType: item.lastMessage.elemType,
+          //   msgStatus: item.lastMessage.status,
+          //   sender: item.lastMessage.sender,
+          //   nickName: item.lastMessage.nickName,
+          //   textElem: item.lastMessage.textElem,
+          // } as TM.NativeTim.ConversationModel
+        })
+        return Promise.resolve(list)
+      })
+      .catch((error: Error) => {
+        return Promise.reject(error)
+      })
   }
 
   deleteConversation(conversationID: string): Promise<void> {
@@ -363,7 +395,7 @@ export class TimModule extends TurboModule implements TM.NativeTim.Spec {
   deleteConversationList(array: string[], clearMessage: boolean): Promise<void> {
     return V2TIMManager.getConversationManager().deleteConversationList(array, clearMessage)
       .then(() => {
-        return
+        return Promise.resolve()
       })
       .catch((error: Error) => {
         return Promise.reject(error)
