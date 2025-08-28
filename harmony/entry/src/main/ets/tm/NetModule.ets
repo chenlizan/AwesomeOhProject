@@ -14,8 +14,7 @@ enum NetType {
 export const NET_CONNECT_STATUS = 'net.connect.status';
 
 export class NetModule extends TurboModule implements TM.NativeNet.Spec {
-  constructor(ctx: UITurboModuleContext) {
-    super(ctx);
+  init(): void {
     let netCon: connection.NetConnection = connection.createNetConnection();
     netCon.register((error: BusinessError) => {
       console.error(JSON.stringify(error));

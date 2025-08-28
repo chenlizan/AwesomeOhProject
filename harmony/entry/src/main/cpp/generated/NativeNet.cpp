@@ -14,6 +14,7 @@ using namespace facebook;
 
 NativeNet::NativeNet(const ArkTSTurboModule::Context ctx, const std::string name) : ArkTSTurboModule(ctx, name) {
     methodMap_ = {
+        ARK_METHOD_METADATA(init, 0),
         ARK_ASYNC_METHOD_METADATA(getCurrentNetStatus, 0),
     };
 }
