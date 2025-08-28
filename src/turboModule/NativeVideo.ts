@@ -1,10 +1,12 @@
-import type {HostComponent, ViewProps} from 'react-native';
+import React from 'react';
+import {HostComponent, View, ViewProps} from 'react-native';
 import {
   DirectEventHandler,
   Double,
   Int32,
 } from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 type DataModal = {
   isPrivate: boolean;
@@ -49,6 +51,18 @@ export interface NativeProps extends ViewProps {
   onPlayFirstStarted?: DirectEventHandler<null> | null;
   onPlayResume?: DirectEventHandler<null> | null;
 }
+
+export type VideoComponentType = HostComponent<NativeProps>;
+
+interface NativeCommands {
+  startPlay: (viewRef: React.ElementRef<VideoComponentType>) => void;
+  stopPlay: (viewRef: React.ElementRef<VideoComponentType>) => void;
+  pausePlay: (viewRef: React.ElementRef<VideoComponentType>) => void;
+}
+
+export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
+  supportedCommands: ['startPlay', 'stopPlay', 'pausePlay'],
+});
 
 export default codegenNativeComponent<NativeProps>(
   'NativeVideo',

@@ -5,16 +5,19 @@
  * @format
  */
 
-import React, {useState} from 'react';
+import React, {useRef} from 'react';
 import {
   Dimensions,
   View,
   ScrollView,
   StyleSheet,
-  Text,
   SafeAreaView,
+  Button,
 } from 'react-native';
-import NativeVideo from './src/turboModule/NativeVideo';
+import NativeVideo, {
+  Commands,
+  VideoComponentType,
+} from './src/turboModule/NativeVideo';
 import {NetModule} from './src/turboModule/NativeNet';
 
 const {height} = Dimensions.get('screen');
@@ -22,11 +25,21 @@ const {height} = Dimensions.get('screen');
 NetModule.init();
 
 function App(): JSX.Element {
+  const nativeViewRef = useRef<React.ElementRef<VideoComponentType>>(null);
+
+  const pausePlay = () => {
+    if (nativeViewRef.current) {
+      Commands.pausePlay(nativeViewRef.current);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.container}>
         <View style={styles.container}>
+          <Button title={'测试'} onPress={pausePlay} />
           <NativeVideo
+            ref={nativeViewRef}
             style={styles.video}
             data={{
               isPrivate: true,

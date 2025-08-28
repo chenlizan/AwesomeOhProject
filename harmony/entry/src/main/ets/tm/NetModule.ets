@@ -1,4 +1,4 @@
-import { TurboModule, UITurboModuleContext } from "@rnoh/react-native-openharmony"
+import { TurboModule } from "@rnoh/react-native-openharmony"
 import { TM } from '@rnoh/react-native-openharmony/generated/ts'
 import { connection } from "@kit.NetworkKit";
 import { BusinessError } from "@kit.BasicServicesKit";

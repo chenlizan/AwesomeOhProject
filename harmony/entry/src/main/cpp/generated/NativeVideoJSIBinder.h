@@ -21,6 +21,9 @@ class NativeVideoJSIBinder : public ViewComponentJSIBinder {
 
     facebook::jsi::Object createCommands(facebook::jsi::Runtime &rt) override {
         auto commands = ViewComponentJSIBinder::createCommands(rt);
+        commands.setProperty(rt, "startPlay", "startPlay");
+        commands.setProperty(rt, "stopPlay", "stopPlay");
+        commands.setProperty(rt, "pausePlay", "pausePlay");
         return commands;
     }
 

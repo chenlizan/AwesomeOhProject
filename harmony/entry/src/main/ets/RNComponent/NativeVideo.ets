@@ -55,6 +55,7 @@ export struct NativeVideo {
   @State fullscreen: boolean = false
   @State showBar: boolean = true
   private aliPlayer: AliPlayer = AliPlayerFactory.createAliPlayer(getContext(), '')
+  private callbackList: Array<() => void> = []
   private eventEmitter: RNC.NativeVideo.EventEmitter | undefined = undefined
   private xComponentController = new XComponentController()
 
@@ -169,6 +170,7 @@ export struct NativeVideo {
       this.screenHeight = px2vp(display.getDefaultDisplaySync().height)
     })
     this.initPlayerEventListeners()
+    this.registerCommandCallback()
     if (this.descriptor.rawProps.data.isPrivate) {
       let urlSource: UrlSource = new UrlSource();
       urlSource.setUri(this.descriptor.rawProps.data.private_url)
@@ -181,6 +183,32 @@ export struct NativeVideo {
       this.aliPlayer.setVidAuthDataSource(vidAuthSource)
       this.aliPlayer.prepare()
     }
+  }
+
+  registerCommandCallback(): void {
+    if (this.ctx) {
+      this.callbackList.push(this.ctx.componentCommandReceiver.registerCommandCallback(
+        this.tag,
+        (command, args: (string | number)[]) => {
+          if (command === 'startPlay') {
+            this.aliPlayer.start()
+          }
+          if (command === 'stopPlay') {
+            this.aliPlayer.stop()
+          }
+          if (command === 'pausePlay') {
+            this.aliPlayer.pause()
+          }
+        }))
+    }
+  }
+
+  cancellationCallback() {
+    this.callbackList.forEach(
+      callback => {
+        callback?.()
+      }
+    )
   }
 
   build() {
@@ -282,6 +310,7 @@ export struct NativeVideo {
   }
 
   aboutToDisappear(): void {
+    this.cancellationCallback()
     if (this.aliPlayer) {
       this.aliPlayer.stop()
       this.aliPlayer.release()
