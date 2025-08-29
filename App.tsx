@@ -44,7 +44,7 @@ function App(): JSX.Element {
           console.log(e.nativeEvent.status);
         }}
       />
-      <Button title={'测试 Dimensions'} onPress={pausePlay} />
+      <Button title={'测试'} onPress={pausePlay} />
     </View>
   );
 }
