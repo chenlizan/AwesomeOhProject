@@ -63,24 +63,24 @@ function App(): JSX.Element {
               <Select.Item label="UI Designing" value="ui" />
               <Select.Item label="Backend Development" value="backend" />
             </Select>
-            {/*<NativeVideo*/}
-            {/*  ref={nativeViewRef}*/}
-            {/*  style={styles.video}*/}
-            {/*  data={{*/}
-            {/*    isPrivate: true,*/}
-            {/*    private_url:*/}
-            {/*      'https://res.vmallres.com//uomcdn/CN/cms/202210/C75C7E20060F3E909F2998E13C3ABC03.mp4',*/}
-            {/*    video_id: '',*/}
-            {/*    play_auth: '',*/}
-            {/*    played: 0,*/}
-            {/*    referer: '',*/}
-            {/*  }}*/}
-            {/*  onFullScreenChange={async e => {*/}
-            {/*    console.log(e.nativeEvent.status);*/}
-            {/*    const {height} = Dimensions.get('window');*/}
-            {/*    console.log(height);*/}
-            {/*  }}*/}
-            {/*/>*/}
+            <NativeVideo
+              ref={nativeViewRef}
+              style={styles.video}
+              data={{
+                isPrivate: true,
+                private_url:
+                  'https://res.vmallres.com//uomcdn/CN/cms/202210/C75C7E20060F3E909F2998E13C3ABC03.mp4',
+                video_id: '',
+                play_auth: '',
+                played: 0,
+                referer: '',
+              }}
+              onFullScreenChange={async e => {
+                console.log(e.nativeEvent.status);
+                const {height} = Dimensions.get('window');
+                console.log(height);
+              }}
+            />
           </View>
         </ScrollView>
       </SafeAreaView>

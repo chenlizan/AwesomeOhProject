@@ -119,7 +119,7 @@ export struct NativeVideo {
               this.hideBar()
               if (this.firstStarted) {
                 this.firstStarted = false
-                this.eventEmitter?.emit("playResume", null)
+                this.eventEmitter?.emit("playFirstStarted", null)
               } else {
                 this.eventEmitter?.emit("playResume", null)
               }

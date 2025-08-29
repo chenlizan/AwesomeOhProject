@@ -1,5 +1,5 @@
 import React from 'react';
-import {HostComponent, View, ViewProps} from 'react-native';
+import {HostComponent, ViewProps} from 'react-native';
 import {
   DirectEventHandler,
   Double,
