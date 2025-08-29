@@ -13,6 +13,7 @@
 #include "RNOH/ArkTSTurboModule.h"
 #include "generated/NativeDeviceInfo.h"
 #include "generated/NativeNet.h"
+#include "generated/NativeQrDecode.h"
 #include "generated/NativeRSA.h"
 #include "generated/NativeSetting.h"
 #include "generated/NativeTim.h"
@@ -35,6 +36,9 @@ class RNOHGeneratedPackageTurboModuleFactoryDelegate : public TurboModuleFactory
         }
         if (name == "NativeNet") {
             return std::make_shared<NativeNet>(ctx, name);
+        }
+        if (name == "NativeQrDecode") {
+            return std::make_shared<NativeQrDecode>(ctx, name);
         }
         if (name == "NativeRSA") {
             return std::make_shared<NativeRSA>(ctx, name);

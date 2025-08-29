@@ -9,6 +9,7 @@ import { RNCVideoPackage } from '@react-native-oh-tpl/react-native-video/ts';
 import { DeviceInfoPackage } from "./tm/DeviceInfoPackage";
 import { SettingPackage } from './tm/SettingPackage';
 import { NetPackage } from './tm/NetPackage'
+import { QrDecodePackage } from './tm/QrDecodePackagae'
 import { VodUploadPackage } from './tm/VodUploadPackage'
 import { RSAPackage } from './tm/RSAPackage'
 import { TimPackage } from './tm/TimPackage'
@@ -24,9 +25,10 @@ export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
     new ViewPagerPackage(ctx),
     new DeviceInfoPackage(ctx),
     new NetPackage(ctx),
+    new QrDecodePackage(ctx),
     new RSAPackage(ctx),
     new SettingPackage(ctx),
     new TimPackage(ctx),
-    new VodUploadPackage(ctx)
+    new VodUploadPackage(ctx),
   ];
 }
