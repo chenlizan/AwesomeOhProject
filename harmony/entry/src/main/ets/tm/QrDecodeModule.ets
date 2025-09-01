@@ -8,12 +8,13 @@ import {
   BinaryBitmap,
   HybridBinarizer,
   Result,
-  NotFoundException
+  NotFoundException,
+  PlanarYUVLuminanceSource  // 新增导入
 } from '@ohos/zxing';
 import image from '@ohos.multimedia.image';
-import { util } from "@kit.ArkTS";
+import util from '@ohos.util';
 
-// 定义支持的条码类型映射
+
 const VALID_BARCODE_TYPES: Map<string, string> = new Map([
   ['aztec', BarcodeFormat.AZTEC.toString()],
   ['ean13', BarcodeFormat.EAN_13.toString()],
@@ -27,91 +28,27 @@ const VALID_BARCODE_TYPES: Map<string, string> = new Map([
   ['interleaved2of5', BarcodeFormat.ITF.toString()],
   ['codabar', BarcodeFormat.CODABAR.toString()],
   ['code128', BarcodeFormat.CODE_128.toString()],
-// 注意：鸿蒙ZXing库可能不支持以下格式
-// ['maxicode', BarcodeFormat.MAXICODE.toString()],
-// ['rss14', BarcodeFormat.RSS_14.toString()],
-// ['rssexpanded', BarcodeFormat.RSS_EXPANDED.toString()],
-// ['upc_a', BarcodeFormat.UPC_A.toString()],
-// ['upc_ean', BarcodeFormat.UPC_EAN_EXTENSION.toString()]
 ]);
 
+// 解码选项接口
+interface DecodeOptions {
+  codeTypes?: string[];
+}
+
+
 export class QrDecodeModule extends TurboModule implements TM.NativeQrDecode.Spec {
-  private async getSmallerBitmap(
-    pixelMap: image.PixelMap,
-    originalWidth: number,
-    originalHeight: number
-  ): Promise<image.PixelMap> {
-    const totalPixels = originalWidth * originalHeight;
-    const maxPixels = 160000; // 最大允许像素数
-    if (totalPixels <= maxPixels) {
-      return pixelMap; // 无需缩小，返回原对象
-    }
-
-    // 计算缩放比例（确保缩小后像素数≤maxPixels）
-    const scaleFactor = Math.sqrt(maxPixels / totalPixels);
-    // 关键：await异步缩放，获取新的PixelMap实例
-    await pixelMap.scale(scaleFactor, scaleFactor);
-
-    return pixelMap
-  }
-
-  private async generateBitmapFromImageData(pixelMap: image.PixelMap): Promise<BinaryBitmap> {
-    // 1. 获取原图像信息
-    const originalImageInfo = await pixelMap.getImageInfo();
-    const originalSize = originalImageInfo.size;
-    const originalWidth = originalSize.width;
-    const originalHeight = originalSize.height;
-
-    // 2. 缩小图像（获取新的PixelMap）
-    const smallerPixelMap = await this.getSmallerBitmap(pixelMap, originalWidth, originalHeight);
-    // 3. 获取缩小后的图像尺寸（关键：用缩小后的尺寸）
-    const smallerImageInfo = await smallerPixelMap.getImageInfo();
-    const smallerWidth = smallerImageInfo.size.width
-    const smallerHeight = smallerImageInfo.size.height
-
-    try {
-      // 4. 读取缩小后的像素数据（指定像素格式为RGB_888，避免Alpha通道干扰）
-      const pixelFormat = image.PixelMapFormat.RGB_888; // 明确RGB格式
-      const bufferSize = smallerPixelMap.getPixelBytesNumber();
-      const arrayBuffer = new ArrayBuffer(bufferSize);
-      await smallerPixelMap.readPixelsToBuffer(arrayBuffer);
-
-      // 5. 转为Int32Array（ZXing需要）
-      const intArray = new Int32Array(arrayBuffer);
-
-      // 6. 创建RGBLuminanceSource（用缩小后的宽高，匹配像素数据）
-      const luminanceSource = new RGBLuminanceSource(
-        intArray,
-        smallerWidth,
-        smallerHeight
-      );
-
-      return new BinaryBitmap(new HybridBinarizer(luminanceSource));
-    } finally {
-      // 关键：释放缩小后的PixelMap，避免内存泄漏
-      if (smallerPixelMap !== pixelMap) {
-        smallerPixelMap.release();
-      }
-    }
-  }
-
-  async decode(base64Data: string, options: TM.NativeQrDecode.OptionsModel): Promise<string> {
+  async decode(base64Data: string, options?: DecodeOptions): Promise<string> {
     try {
       let base64Helper = new util.Base64Helper();
-
-      // Base64解码
-      const decodedData: Uint8Array = base64Helper.decodeSync(base64Data)
-
-      // 创建ImageSource
+      if (base64Data.startsWith('data:')) {
+        base64Data = base64Data.split(',')[1];
+      }
+      const decodedData: Uint8Array =  base64Helper.decodeSync(base64Data)
       const imageSource: image.ImageSource = image.createImageSource(decodedData.buffer);
-
-      // 创建PixelMap
       const pixelMap: image.PixelMap = await imageSource.createPixelMap();
-
-
-      const reader: MultiFormatReader = new MultiFormatReader();
       let result: Result | null = null;
-      // 设置解码提示
+      const reader: MultiFormatReader = new MultiFormatReader();
+
       if (options && options.codeTypes && options.codeTypes.length > 0) {
         const hints: Map<DecodeHintType, BarcodeFormat[]> = new Map();
         const decodeFormats: BarcodeFormat[] = [];
@@ -135,30 +72,128 @@ export class QrDecodeModule extends TurboModule implements TM.NativeQrDecode.Spe
       }
 
       try {
-        // 生成BinaryBitmap并解码
         const binaryBitmap: BinaryBitmap = await this.generateBitmapFromImageData(pixelMap);
+        console.log("today + binaryBitmap" + JSON.stringify(binaryBitmap))
 
-        result = reader.decode(binaryBitmap) as Result;
+        result = reader.decode(binaryBitmap);
+        console.log("today + result" + JSON.stringify(result))
       } catch (e) {
         if (e instanceof NotFoundException) {
           console.log('No barcode found in the image');
-          // 可以尝试旋转图像后再次解码
-          // const rotatedPixelMap = await this.rotateImage(pixelMap, 90);
-          // const rotatedBinaryBitmap = await this.generateBitmapFromImageData(rotatedPixelMap);
-          // result = reader.decode(rotatedBinaryBitmap);
         } else {
-          console.error(`Decode error: ${JSON.stringify(e)}`);
+          console.error(`Decode error: ${e instanceof Error ? e.message : JSON.stringify(e)}`);
         }
       } finally {
         // 释放资源
         pixelMap.release();
         imageSource.release();
       }
-
-      return Promise.resolve(result ? result.getText() : "");
+      console.log("today" + result?.getText());
+      return result ? result.getText() : "";
     } catch (error) {
-      console.error(`QR decode error: ${JSON.stringify(error)}`);
-      throw new Error(`QR decode failed: ${error.message}`);
+      console.error(`QR decode error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+      throw new Error(`QR decode failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+
+  private async getSmallerBitmap(
+    pixelMap: image.PixelMap,
+    originalWidth: number,
+    originalHeight: number
+  ): Promise<image.PixelMap> {
+    const totalPixels = originalWidth * originalHeight;
+    const maxPixels = 300000;
+    if (totalPixels <= maxPixels) {
+      return pixelMap;
+    }
+    const scaleFactor = Math.sqrt(maxPixels / totalPixels);
+    // 修复：使用scale方法返回的新实例
+    await pixelMap.scale(scaleFactor, scaleFactor);
+    return  pixelMap
+  }
+
+  private async generateBitmapFromImageData(pixelMap: image.PixelMap): Promise<BinaryBitmap> {
+    // 1. 获取图像信息以获取原始宽高
+    const imageInfo = await pixelMap.getImageInfo();
+    console.log("today" + JSON.stringify(imageInfo))
+
+    const originalWidth = imageInfo.size.width;
+    const originalHeight = imageInfo.size.height;
+
+    // 2. 图片缩放（修复参数不匹配问题）
+    const smallerPixelMap = await this.getSmallerBitmap(pixelMap, originalWidth, originalHeight);
+    const smallerImageInfo = await smallerPixelMap.getImageInfo();
+    const width = smallerImageInfo.size.width;
+    const height = smallerImageInfo.size.height;
+
+    try {
+      // 3. 读取RGB像素数据（指定RGB_888格式）
+      const pixelFormat = image.PixelMapFormat.RGB_888;
+      const bufferSize = smallerPixelMap.getPixelBytesNumber();
+      const arrayBuffer = new ArrayBuffer(bufferSize);
+      await smallerPixelMap.readPixelsToBuffer(arrayBuffer);
+      const rgbPixels = new Int32Array(arrayBuffer);
+
+      // 4. 转换为YUV420SP格式
+      const yuv420sp = this.encodeYUV420SP(rgbPixels, width, height);
+
+      // 5. 创建PlanarYUVLuminanceSource
+      const luminanceSource = new PlanarYUVLuminanceSource(
+        new Uint8ClampedArray(yuv420sp),        // YUV数据
+        width,           // 图像宽度
+        height,          // 图像高度
+        0,               // 左偏移
+        0,               // 上偏移
+        width,           // 裁剪宽度
+        height,          // 裁剪高度
+        false            // 不反转水平方向
+      );
+      console.log("today" + JSON.stringify(luminanceSource))
+      return new BinaryBitmap(new HybridBinarizer(luminanceSource));
+    } finally {
+      // 释放缩放后的PixelMap
+      if (smallerPixelMap !== pixelMap) {
+        smallerPixelMap.release();
+      }
+    }
+  }
+
+  /**
+   * 转换RGB为YUV420SP格式
+   */
+  private encodeYUV420SP(rgbPixels: Int32Array, width: number, height: number): Uint8Array {
+    const frameSize = width * height;
+    const yuv420sp = new Uint8Array(frameSize + Math.ceil(frameSize / 2));
+
+    let yIndex = 0;
+    let uvIndex = frameSize;
+    let argbIndex = 0;
+
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
+        // 提取RGB值（忽略Alpha通道）
+        const rgb = rgbPixels[argbIndex++];
+        const R = (rgb >> 16) & 0xff;
+        const G = (rgb >> 8) & 0xff;
+        const B = rgb & 0xff;
+
+        // RGB转YUV公式
+        const Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
+        const U = ((-38 * R - 74 * G + 112 * B + 128) >> 8) + 128;
+        const V = ((112 * R - 94 * G - 18 * B + 128) >> 8) + 128;
+
+        // 确保像素值在0-255范围内
+        yuv420sp[yIndex++] = Math.max(0, Math.min(Y, 255));
+
+        // UV通道按2x2采样（仅偶数行和偶数列）
+        if ((j % 2 === 0) && (i % 2 === 0)) {
+          yuv420sp[uvIndex++] = Math.max(0, Math.min(V, 255));
+          yuv420sp[uvIndex++] = Math.max(0, Math.min(U, 255));
+        }
+      }
+    }
+
+    return yuv420sp;
+  }
+
 }
