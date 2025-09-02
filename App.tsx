@@ -6,20 +6,27 @@
  */
 
 import React, {useRef, useState} from 'react';
-import {Button, Dimensions, View, StyleSheet} from 'react-native';
+import {
+  Button,
+  Dimensions,
+  View,
+  StyleSheet,
+  DeviceEventEmitter,
+} from 'react-native';
 import NativeVideo, {
   Commands,
   VideoComponentType,
 } from './src/turboModule/NativeVideo';
-import {NetModule} from './src/turboModule/NativeNet';
-
-NetModule.init();
+import {NET_CONNECT_STATUS} from './src/turboModule/NativeNet';
 
 const {width} = Dimensions.get('window');
 
 function App(): JSX.Element {
   const nativeViewRef = useRef<React.ElementRef<VideoComponentType>>(null);
 
+  DeviceEventEmitter.addListener(NET_CONNECT_STATUS, data => {
+    console.log(data?.status);
+  });
   const pausePlay = () => {
     if (nativeViewRef.current) {
       Commands.pausePlay(nativeViewRef.current);

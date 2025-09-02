@@ -1,4 +1,4 @@
-import { TurboModule } from "@rnoh/react-native-openharmony"
+import { TurboModule, UITurboModuleContext } from "@rnoh/react-native-openharmony"
 import { TM } from '@rnoh/react-native-openharmony/generated/ts'
 import { connection } from "@kit.NetworkKit";
 import { BusinessError } from "@kit.BasicServicesKit";
@@ -14,7 +14,8 @@ enum NetType {
 export const NET_CONNECT_STATUS = 'net.connect.status';
 
 export class NetModule extends TurboModule implements TM.NativeNet.Spec {
-  init(): void {
+  constructor(ctx: UITurboModuleContext) {
+    super(ctx)
     let netCon: connection.NetConnection = connection.createNetConnection();
     netCon.register((error: BusinessError) => {
       console.error(JSON.stringify(error));
