@@ -10,12 +10,10 @@ import {
   TraceJSBundleProviderDecorator,
   RNOHCoreContext
 } from '@rnoh/react-native-openharmony';
-import { RNCVideo, RNC_VIDEO_TYPE } from "@react-native-oh-tpl/react-native-video"
 import { createRNPackages } from '../RNPackagesFactory';
-
 import { NativeVideo, NATIVE_VIDEO_TYPE } from '../RNComponent/NativeVideo';
 
-const arkTsComponentNames: Array<string> = [RNC_VIDEO_TYPE, NATIVE_VIDEO_TYPE];
+const arkTsComponentNames: Array<string> = [NATIVE_VIDEO_TYPE];
 
 @Builder
 export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
@@ -23,12 +21,6 @@ export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
     NativeVideo({
       ctx: ctx.rnComponentContext,
       tag: ctx.tag,
-    })
-  }
-  if (ctx.componentName === RNC_VIDEO_TYPE) {
-    RNCVideo({
-      ctx: ctx.rnComponentContext,
-      tag: ctx.tag
     })
   }
 }
