@@ -24,23 +24,6 @@ enum Events {
   ERROR = 'error'
 }
 
-function fill(value: number): string {
-  return value.toString().padStart(2, '0')
-}
-
-function msToCountdownTime(ms: number): string {
-  if (!ms) {
-    return '00:00'
-  }
-
-  const days = Math.floor(ms / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((ms % (1000 * 60)) / 1000)
-  return `${(days ? fill(days) + ':' : '')}${(hours ? fill(hours) + ':' : '')}
-      ${fill(minutes)}:${fill(seconds)} `.trim()
-}
-
 interface DataModal {
   uri: string;
 }
