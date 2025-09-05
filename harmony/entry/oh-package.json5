@@ -13,7 +13,6 @@
     "@react-native-oh-tpl/react-native-reanimated": "file:../../node_modules/@react-native-oh-tpl/react-native-reanimated/harmony/reanimated.har",
     "@react-native-oh-tpl/react-native-safe-area-context": "file:../../node_modules/@react-native-oh-tpl/react-native-safe-area-context/harmony/safe_area.har",
     "@react-native-oh-tpl/react-native-svg": "file:../../node_modules/@react-native-oh-tpl/react-native-svg/harmony/svg.har",
-    "@react-native-oh-tpl/react-native-video": "file:../../node_modules/@react-native-oh-tpl/react-native-video/harmony/rn_video.har",
     "premierlibrary": "file:./libs/apsaravideo_player_sdk_harmonyosnext_20241030.har",
     "@aliyun_video_cloud/vod-upload-sdk": "^1.0.1",
     "@tencentcloud/imsdk": "^8.6.7020",

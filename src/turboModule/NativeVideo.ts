@@ -8,7 +8,7 @@ import {
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
-type DataModal = {
+export type DataModal = {
   isPrivate: boolean;
   private_url: string;
   video_id: string;
@@ -17,24 +17,24 @@ type DataModal = {
   referer: string;
 };
 
-type ErrorEvent = {
+export type ErrorEvent = {
   code: Int32;
   message: string;
 };
 
-type StatusEvent = {
+export type StatusEvent = {
   status: boolean;
 };
 
-type DurationEvent = {
+export type DurationEvent = {
   progress: Double;
 };
 
-type ProgressEvent = {
+export type ProgressEvent = {
   progress: Double;
 };
 
-type RateEvent = {
+export type RateEvent = {
   rate: Double;
 };
 

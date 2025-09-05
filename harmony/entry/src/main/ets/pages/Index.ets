@@ -11,12 +11,19 @@ import {
   RNOHCoreContext
 } from '@rnoh/react-native-openharmony';
 import { createRNPackages } from '../RNPackagesFactory';
+import { NativeAudio, NATIVE_AUDIO_TYPE } from '../RNComponent/NativeAudio'
 import { NativeVideo, NATIVE_VIDEO_TYPE } from '../RNComponent/NativeVideo';
 
-const arkTsComponentNames: Array<string> = [NATIVE_VIDEO_TYPE];
+const arkTsComponentNames: Array<string> = [NATIVE_AUDIO_TYPE, NATIVE_VIDEO_TYPE];
 
 @Builder
 export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
+  if (ctx.componentName === NATIVE_AUDIO_TYPE) {
+    NativeAudio({
+      ctx: ctx.rnComponentContext,
+      tag: ctx.tag,
+    })
+  }
   if (ctx.componentName === NATIVE_VIDEO_TYPE) {
     NativeVideo({
       ctx: ctx.rnComponentContext,
